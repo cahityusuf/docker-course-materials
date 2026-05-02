@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-basit",
+  "version": "1.0.0",
+  "description": "Modul 5 - Tek dosyalik Node.js HTTP sunucusu",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

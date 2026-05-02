@@ -1,0 +1,41 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editör
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Office geçici dosyaları
+~$*.docx
+~$*.pptx
+~$*.xlsx
+.~lock.*
+*.tmp
+
+# Lab klasörlerinde build sırasında oluşabilecek dosyalar
+labs/**/node_modules/
+labs/**/dist/
+labs/**/build/
+labs/**/__pycache__/
+labs/**/*.pyc
+labs/**/.venv/
+labs/**/venv/
+labs/**/postgres-data/
+labs/**/uploads/
+labs/**/*.log
+
+# Çevre değişkenleri (sırlar!)
+.env
+.env.local
+.env.*.local
+labs/**/secrets/
+
+# Docker geçici çıktıları
+*.tar
+*.tar.gz
+docker-compose.override.yml
