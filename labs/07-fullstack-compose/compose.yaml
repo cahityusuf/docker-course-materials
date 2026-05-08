@@ -1,0 +1,111 @@
+# Docker Compose - Fullstack Lab
+# Angular SPA + .NET 8 Web API + PostgreSQL + Redis + pgAdmin + RedisInsight
+#
+# Çalıştırma: docker compose up -d
+# Durdurma:   docker compose down
+# Verileri de silmek için: docker compose down -v
+
+services:
+  # ───────── Frontend ─────────
+
+  # ───────── Backend API ─────────
+  api:
+    build: ./api
+    container_name: fs-api
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Database=productsdb;Username=appuser;Password=${POSTGRES_PASSWORD:-apppass}"
+      ConnectionStrings__Redis: "redis:6379"
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "8080:8080"        # http://localhost:8080 (Swagger: /swagger)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [app-net]
+    restart: unless-stopped
+
+  # ───────── PostgreSQL ─────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: fs-postgres
+    environment:
+      POSTGRES_DB: productsdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apppass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"        # Lokalde DBeaver/psql ile bağlanmak için
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d productsdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks: [app-net]
+    restart: unless-stopped
+
+  # ───────── Redis ─────────
+  redis:
+    image: redis:7-alpine
+    container_name: fs-redis
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [app-net]
+    restart: unless-stopped
+
+  # ───────── pgAdmin (PostgreSQL UI) ─────────
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: fs-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"        # Tek kullanıcı modu (login olmadan bağlanır)
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+      - ./db/pgadmin-servers.json:/pgadmin4/servers.json:ro
+    ports:
+      - "5050:80"          # http://localhost:5050
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [app-net]
+    restart: unless-stopped
+
+  # ───────── RedisInsight (Redis UI) ─────────
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: fs-redisinsight
+    volumes:
+      - redisinsightdata:/data
+    ports:
+      - "5540:5540"        # http://localhost:5540
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [app-net]
+    restart: unless-stopped
+
+# ───────── Ortak ağ ─────────
+networks:
+  app-net:
+    driver: bridge
+# ───────── Kalıcı volume'ler ─────────
+volumes:
+  pgdata:
+  redisdata:
+  pgadmindata:
+  redisinsightdata:

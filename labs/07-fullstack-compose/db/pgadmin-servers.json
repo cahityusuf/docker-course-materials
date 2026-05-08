@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Fullstack Lab DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "productsdb",
+      "Username": "appuser",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass"
+    }
+  }
+}
