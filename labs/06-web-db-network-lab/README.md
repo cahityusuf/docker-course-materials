@@ -40,8 +40,18 @@ docker run -d --name db-default \
 docker run -d --name web-default nginx:1.27-alpine
 
 docker exec web-default getent hosts db-default
-# Çıktı yok! Default bridge'te container'lar birbirini isimle bulamaz
-# (Sadece IP ile, ki o da değişebilir)
+# Linux Docker Engine: Çıktı yok — default bridge'te container'lar isimle bulunamaz
+#
+# Docker Desktop (Mac/Windows): Yanıltıcı çıktı gelebilir, örneğin:
+#   192.168.1.1  db-default  db-default
+# Ama bu IP container'ın IP'si DEĞİL — router veya host IP'si döner.
+# macOS'un kendi DNS stack'i devreye giriyor ve yanlış adres çözümlüyor.
+# Gerçek bağlantı yine de başarısız olur:
+docker exec web-default ping -c 2 db-default  # bağlanamaz ya da yanlış hedefe gider
+#
+# Kesin test: container'ın gerçek IP'sini al ve karşılaştır:
+docker inspect db-default --format '{{.NetworkSettings.IPAddress}}'
+# getent hosts'un döndürdüğü IP bununla eşleşmiyorsa DNS yanılıyor demektir.
 
 # Temizlik (default bridge testi)
 docker rm -f db-default web-default

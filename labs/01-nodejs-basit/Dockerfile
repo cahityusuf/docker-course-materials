@@ -8,11 +8,11 @@ WORKDIR /app
 
 # Önce SADECE bağımlılık manifesti kopyala (cache!)
 # Kod değişse de package.json değişmediyse npm install cache'den gelir
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 RUN npm ci --omit=dev || npm install --omit=dev
 
 # Sonra asıl kod
-COPY . .
+COPY --chown=node:node . .
 
 # Non-root kullanıcı (alpine'de "node" kullanıcısı zaten var)
 USER node
