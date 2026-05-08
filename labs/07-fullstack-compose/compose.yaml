@@ -51,7 +51,7 @@ services:
     volumes:
       - pgadmindata:/var/lib/pgadmin
     depends_on:
-      - db
+      - postgres
 
   # ───────── Redis ─────────
   redis:
