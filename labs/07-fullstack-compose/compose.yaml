@@ -49,7 +49,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: microzon@microzon.com
       PGADMIN_DEFAULT_PASSWORD: secureP@ssw0rd
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmindata:/var/lib/pgadmin
     depends_on:
       - db
 
