@@ -38,7 +38,7 @@ services:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: secureP@ssw0rd
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
